@@ -30,7 +30,7 @@ docker build --tag (-t) <IMAGE NAME>:<IMAGE TAG> PATH[OPTIONS] PATH (| URL | -)
 
 `--tag, -t` - image name & tag
 ```
-docker build -t test-image:latest
+docker build -t test-image:latest .
 ```
 `--file, -f` - change path and default name of `Dockerfile`
 ```
@@ -62,15 +62,24 @@ docker run [OPTIONS] IMAGE[:TAG] [COMMAND] [ARG...]
 `[ARG..]` - arguments to the command
 
 ### Options:
+`--entrypoint` - default app to launch in the container, overrides `ENTRYPOINT` directive \
+`--env, -e` - set an environment variable inside the container \
+`--env-file` - set environment variables inside the container from a file \
+`--interactive, -i`, `--tty, -t` - usually used together as `-it` to attach a terminal session to a container \
+`--name` - specify a name of the container to be run from the IMAGE, if not specified will be generated automatically \
+`--volume, -v` - attach a mounted volume, an external file system, to the container. To attach working directory (that you use `docker run` in): -v $(pwd):/my_app_dir \
+`--workdir, -w` - default working directory inside the container, overrides `WORKDIR` directive, path must be absolute
 ```
 docker run \
 -it --entrypoint='/bin/bash' \
 -w "/my_app_dir" \
 --env MY_VAR="myvalue" \
---name=my-cool-container \
+--name=our_container \
 -v $(pwd):/my_app_dir \
 python:3.10.8-slim-buster
 ```
+`--detach, -d` - run in the background \
+`--rm` - remove container after it stops, if run used again a new container will be created from the same image, `--interactive` flag might block it
 ```
 docker run \
 -d \
@@ -78,22 +87,18 @@ docker run \
 --rm \
 python:3.10.8-slim-buster
 ```
-`--detach, -d` - run in the background \
-`--entrypoint` - default app to launch in the container, overrides `ENTRYPOINT` directive \
-`--env, -e` - set an environment variable inside the container \
-`--env-file` - set environment variables inside the container from a file \
-`--interactive, -i`, `--tty, -t` - usually used together as `-it` to attach a terminal session to a container \
-`--name` - specify a name of the container to be run from the IMAGE, if not specified will be generated automatically \
-`--rm` - remove container after it stops, if run used again a new container will be created from the same image, `--interactive` flag might block it \
-`--volume, -v` - attach a mounted volume, an external file system, to the container. To attach working directory (that you use `docker run` in): -v $(pwd):/my_app_dir \
-`--workdir, -w` - default working directory inside the container, overrides `WORKDIR` directive, path must be absolute
 
 ## Debugging & cleanup
 ### Open an interactive shell in a container
 
 #### Start a container with a shell:
+For containers with ENTRYPOINT defined
 ```
-docker run -it (--entrypoint) /bin/sh IMAGE
+docker run -it --entrypoint='/bin/sh' dockerize-python:latest
+```
+For containers with no entrypoint defined (just `CMD` defined or nothing)
+```
+docker run -it python:3.10.8-slim-buster /bin/sh
 ```
 * `--entrypoint` required if image has `ENTRYPOINT` defined, otherwise the command, e.g. /bin/bash will be passed as a argument to entrypoint command, e.g. will be read as `python app.py /bin/sh` in the example container
 * `/bin/sh` is a default shell in linux, can also try `/bin/bash`
@@ -101,7 +106,7 @@ docker run -it (--entrypoint) /bin/sh IMAGE
 ---
 #### Open shell in a running container:
 ```
-docker exec -it /bin/sh CONTAINER_ID/CONTAINER NAME
+docker exec -it CONTAINER_ID/CONTAINER NAME /bin/sh
 ```
 ---
 <br>
