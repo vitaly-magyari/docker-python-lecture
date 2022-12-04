@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE="dockerize-python:latest"
+IMAGE="vayumagyari/hello-python-k8s:latest"
 
 docker build -t $IMAGE .
 
