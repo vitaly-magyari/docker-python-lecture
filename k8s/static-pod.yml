@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: py-app-pod
+spec:
+  containers:
+      - name: hello-python
+        image: vayumagyari/hello-python-k8s:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
